@@ -1,19 +1,22 @@
 import random
 import numpy as np
+import decimal
 mod = 1000000007
 dp = np.zeros((55, 55))
 faces = 6
 
 
 def game_start():
-    roll = input("Would you like to roll a dice? (Yes/No): ")
-    if roll.lower() == "Yes".lower():
-        ask_before_roll_dice()
-    elif roll.lower() == "No".lower():
-        print("Oh :(")
-    else:
-        print("Please enter a valid option (Yes/No)")
-        game_start()
+    while True:
+        roll = input("Would you like to roll a dice? (Yes/No): ")
+        if roll.lower() == "Yes".lower():
+            ask_before_roll_dice()
+            break
+        elif roll.lower() == "No".lower():
+            print("Oh :(")
+            break
+        else:
+            print("Please enter a valid option (Yes/No)")
         
 def ask_before_roll_dice():
     global dice_count 
@@ -66,28 +69,25 @@ def NoofWays(faces, dice_count, target_sum):
     return dp[dice_count][target_sum]
 
 def probability_of_sum(dice_count, target_sum):
-    global ways_to_get_k
-    if dice_count == 0:
-        return 0
-    if target_sum > 6 * dice_count or target_sum < dice_count:
-        return 0
-    global total_ways
-    ways_to_get_k = NoofWays(faces, dice_count, target_sum)
-    total_ways = 6**dice_count
-    prob = ways_to_get_k / total_ways
-    for i in range(55):
-        for j in range(55):
-            dp[i][j] = -1
-    if len(str(ways_to_get_k)) > 10:
-        ways_to_get_k = "{:.1e}".format(ways_to_get_k)
-    if len(str(total_ways)) > 10:
-        total_ways = "{:.1e}".format(total_ways)
-    return prob
+        global ways_to_get_k
+        global total_ways
+        ways_to_get_k = NoofWays(faces, dice_count, target_sum)
+        total_ways = faces**dice_count
+        prob = ways_to_get_k / total_ways
+        ways_to_get_k = format(decimal.Decimal(ways_to_get_k), '.1e')
+        total_ways = format(decimal.Decimal(total_ways), '.1e')
+        for i in range(55):
+            for j in range(55):
+                dp[i][j] = -1
+        if target_sum > faces * dice_count or target_sum < dice_count:
+            print(f"The sum must be between {dice_count} and {faces * dice_count}")
+        
+        return prob
 
 def roll_dice():
     dice_sum = 0
     for i in range(dice_count):
-        dice_result = random.randint(1, 6)
+        dice_result = random.randint(1, faces)
         dice_sum += dice_result
         print(f"Dice number {i + 1} rolled {dice_result}")
     print(f"The dice sum was {dice_sum}")
@@ -98,15 +98,17 @@ def roll_dice():
     roll_again()
 
 def roll_again():
+    while True:
         roll = input("Roll again? (Yes/No): ")
         if roll.lower() == "Yes".lower():
             ask_before_roll_dice()
-
+            break
         elif roll.lower() == "No".lower():
             print("Oh :(")
-            return
+            break
         else:
             print("Please provide a valid input (Yes/No)")
             roll_again()
+            break
 
 game_start()
